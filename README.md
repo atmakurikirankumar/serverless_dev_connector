@@ -1,6 +1,6 @@
 Serverless Dev Connector
 
-Backend created by Serverless Framework with custom authorizer.
+Backend created by Serverless Framework with custom authorizer and Serverless-request-validator plugin to validate the incoming requests body.
 
 Auth Service: Custom Authorizer for all the Lambda functions that require JWT Token Authorization.
 
