@@ -1,0 +1,21 @@
+schema:
+  required:
+    - school
+    - degree
+    - fieldofstudy
+    - from
+  properties:
+    school:
+      type: string
+    degree:
+      type: string
+    fieldofstudy:
+      type: string
+    from:
+      type: string
+    to:
+      type: string
+    description:
+      type: string
+    current:
+      type: boolean

@@ -1,0 +1,20 @@
+schema:
+  required:
+    - title
+    - company
+    - from
+  properties:
+    title:
+      type: string
+    company:
+      type: string
+    location:
+      type: string
+    from:
+      type: string
+    to:
+      type: string
+    description:
+      type: string
+    current:
+      type: boolean

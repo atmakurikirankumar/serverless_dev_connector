@@ -1,0 +1,12 @@
+PostsTableIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:PutItem
+    - dynamodb:Query
+    - dynamodb:Scan
+    - dynamodb:DeleteItem
+    - dynamodb:UpdateItem
+    - dynamodb:GetItem
+  Resource:
+    - ${self:custom.PostsTable.arn}
+    - !Join ["/", ["${self:custom.PostsTable.arn}", "index", "${self:custom.PostsTable.gsi}"]]

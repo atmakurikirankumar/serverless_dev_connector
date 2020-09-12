@@ -1,0 +1,6 @@
+schema:
+  required:
+    - text
+  properties:
+    text:
+      type: string

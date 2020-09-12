@@ -1,0 +1,11 @@
+ProfilesTableIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:PutItem
+    - dynamodb:Query
+    - dynamodb:Scan
+    - dynamodb:DeleteItem
+    - dynamodb:UpdateItem
+  Resource:
+    - ${self:custom.ProfilesTable.arn}
+    - !Join ["/", ["${self:custom.ProfilesTable.arn}", "index", "${self:custom.ProfilesTable.gsi}"]]

@@ -1,0 +1,13 @@
+{
+  "name": "auth-service",
+  "version": "1.0.0",
+  "description": "Codingly template for Serverless Framework projects",
+  "author": "Ariel Weinberger <ariel@codingly.io>",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-bundle": "^1.3.3"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1"
+  }
+}

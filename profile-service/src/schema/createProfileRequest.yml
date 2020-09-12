@@ -1,0 +1,29 @@
+schema:
+  required:
+    - skills
+    - status
+  properties:
+    company:
+      type: string
+    website:
+      type: string
+    location:
+      type: string
+    bio:
+      type: string
+    skills:
+      type: string
+    githubusername:
+      type: string
+    status:
+      type: string
+    youtube:
+      type: string
+    twitter:
+      type: string
+    facebook:
+      type: string
+    instagram:
+      type: string
+    linkedin:
+      type: string

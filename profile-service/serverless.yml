@@ -1,0 +1,319 @@
+service:
+  name: profile-service
+plugins:
+  - serverless-bundle
+  - serverless-pseudo-parameters
+  - serverless-aws-documentation
+  - serverless-reqvalidator-plugin
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: "us-east-1"
+  iamRoleStatements:
+    - ${file(src/iam/ProfilesTableIAM.yml):ProfilesTableIAM}
+    - ${file(src/iam/UsersTableIAM.yml):UsersTableIAM}
+    - ${file(src/iam/PostsTableIAM.yml):PostsTableIAM}
+  environment:
+    PROFILES_TABLE_NAME: ${self:custom.ProfilesTable.name}
+    PROFILES_TABLE_GSI: ${self:custom.ProfilesTable.gsi}
+    JWT_SECRET: jwtsecret-${self:provider.stage}
+    USERS_TABLE_GSI: ${self:custom.UsersTable.gsi}
+    USERS_TABLE_NAME: ${self:custom.UsersTable.name}
+    GITHUB_TOKEN: "b1cc0a4b8e5eeb08345cc6e0a23f82eda073d1a8"
+    POSTS_TABLE_NAME: ${self:custom.PostsTable.name}
+    POSTS_TABLE_GSI: ${self:custom.PostsTable.gsi}
+resources:
+  Resources:
+    onlyBody: ${file(src/resources/onlyBody.yml):onlyBody}
+    UsersTable: ${file(src/resources/UsersTable.yml):UsersTable}
+    ProfilesTable: ${file(src/resources/ProfilesTable.yml):ProfilesTable}
+    PostsTable: ${file(src/resources/PostsTable.yml):PostsTable}
+functions:
+  registerUser:
+    handler: src/handlers/users/registerUser.handler
+    events:
+      - http:
+          documentation:
+            summary: "Register user"
+            description: "Registers new user"
+            tags:
+              - User
+            requestModels:
+              "application/json": RegisterUserRequest
+          method: POST
+          path: /user/register
+          cors: true
+          reqValidatorName: onlyBody
+  userLogin:
+    handler: src/handlers/users/userLogin.handler
+    events:
+      - http:
+          documentation:
+            summary: "Login user"
+            description: "Login User"
+            tags:
+              - User
+            requestModels:
+              "application/json": LoginUserRequest
+          method: POST
+          path: /user/login
+          cors: true
+          reqValidatorName: onlyBody
+  getLoggedInUser:
+    handler: src/handlers/users/getLoggedInUser.handler
+    events:
+      - http:
+          method: GET
+          path: /user/getuser
+          authorizer: ${self:custom.Authorizer.arn}
+          cors: true
+  forgotPassword:
+    handler: src/handlers/users/forgotPassword.handler
+    events:
+      - http:
+          documentation:
+            summary: "Forgot Password Helper"
+            description: "Forgot Password Helper"
+            tags:
+              - User
+            requestModels:
+              "application/json": ForgotPasswordRequest
+          method: POST
+          path: /user/forgotpwd
+          cors: true
+          reqValidatorName: onlyBody
+  getMyProfile:
+    handler: src/handlers/profiles/getMyProfile.handler
+    events:
+      - http:
+          method: GET
+          path: /profile/me
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  getAllProfiles:
+    handler: src/handlers/profiles/getAllProfiles.handler
+    events:
+      - http:
+          method: GET
+          path: /profile/all
+          cors: true
+  getProfileByUser:
+    handler: src/handlers/profiles/getProfileByUser.handler
+    events:
+      - http:
+          method: GET
+          path: /profile/user/{user_id}
+          cors: true
+  createProfile:
+    handler: src/handlers/profiles/createProfile.handler
+    events:
+      - http:
+          documentation:
+            summary: "Create Profile"
+            description: "Create a Profile for an user"
+            tags:
+              - Profile
+            requestModels:
+              "application/json": CreateProfileRequest
+          method: POST
+          path: /profile/create
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+          reqValidatorName: onlyBody
+  addExperienceToProfile:
+    handler: src/handlers/profiles/addExperience.handler
+    events:
+      - http:
+          documentation:
+            summary: "Add Experience to a profile"
+            description: "Add Experience to prfoile of the logged in user"
+            tags:
+              - Profile
+            requestModels:
+              "application/json": AddExperienceRequest
+          method: PATCH
+          path: /profile/experience
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+          reqValidatorName: onlyBody
+  addEducationToProfile:
+    handler: src/handlers/profiles/addEducation.handler
+    events:
+      - http:
+          documentation:
+            summary: "Add Education to a profile"
+            description: "Add Education to prfoile of the logged in user"
+            tags:
+              - Profile
+            requestModels:
+              "application/json": AddEducationRequest
+          method: PATCH
+          path: /profile/education
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+          reqValidatorName: onlyBody
+  deleteExperience:
+    handler: src/handlers/profiles/deleteExperience.handler
+    events:
+      - http:
+          method: PATCH
+          path: /profile/experience/{exp_id}
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  deleteEducation:
+    handler: src/handlers/profiles/deleteEducation.handler
+    events:
+      - http:
+          method: PATCH
+          path: /profile/education/{edu_id}
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  deleteProfile:
+    handler: src/handlers/profiles/deleteProfile.handler
+    events:
+      - http:
+          method: DELETE
+          path: /profile
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  getGithubRepos:
+    handler: src/handlers/github/getGithubRepos.handler
+    events:
+      - http:
+          method: GET
+          path: /profile/github/{github_username}
+          cors: true
+  createPost:
+    handler: src/handlers/posts/createPost.handler
+    events:
+      - http:
+          documentation:
+            summary: "Create Post"
+            description: "Create a Post"
+            tags:
+              - Post
+            requestModels:
+              "application/json": CreatePostRequest
+          method: POST
+          path: /post/create
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+          reqValidatorName: onlyBody
+  getAllPosts:
+    handler: src/handlers/posts/getAllPosts.handler
+    events:
+      - http:
+          method: GET
+          path: /post/all
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  getPostById:
+    handler: src/handlers/posts/getPostById.handler
+    events:
+      - http:
+          method: GET
+          path: /post/{post_id}
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  deletePost:
+    handler: src/handlers/posts/deletePost.handler
+    events:
+      - http:
+          method: DELETE
+          path: /post/{post_id}
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  likePost:
+    handler: src/handlers/posts/likePost.handler
+    events:
+      - http:
+          method: PATCH
+          path: /post/like/{post_id}
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  unLikePost:
+    handler: src/handlers/posts/unLikePost.handler
+    events:
+      - http:
+          method: PATCH
+          path: /post/unlike/{post_id}
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  commentPost:
+    handler: src/handlers/posts/commentPost.handler
+    events:
+      - http:
+          documentation:
+            summary: "Comment Post"
+            description: "Comment Post"
+            tags:
+              - Post
+            requestModels:
+              "application/json": CommentPostRequest
+          method: PATCH
+          path: /post/{post_id}/comment
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+  deletePostComment:
+    handler: src/handlers/posts/deletePostComment.handler
+    events:
+      - http:
+          method: DELETE
+          path: /post/{post_id}/comment/{comment_id}
+          cors: true
+          authorizer: ${self:custom.Authorizer.arn}
+custom:
+  documentation:
+    api:
+      info:
+        version: '1.0.0'
+        title: Dev Connector Profile Service
+        description: Dev Connector Profile Service
+      tags:
+        - name: Profile
+          description: Users and Profiles Management
+    models:
+      - name: RegisterUserRequest
+        contentType: "application/json"
+        schema: ${file(src/schema/registerUserRequest.yml):schema}
+      - name: LoginUserRequest
+        contentType: "application/json"
+        schema: ${file(src/schema/loginUserRequest.yml):schema}
+      - name: CreateProfileRequest
+        contentType: "application/json"
+        schema: ${file(src/schema/createProfileRequest.yml):schema}
+      - name: AddExperienceRequest
+        contentType: "application/json"
+        schema: ${file(src/schema/addExperienceRequest.yml):schema}
+      - name: AddEducationRequest
+        contentType: "application/json"
+        schema: ${file(src/schema/addEducationRequest.yml):schema}
+      - name: CreatePostRequest
+        contentType: "application/json"
+        schema: ${file(src/schema/createPostRequest.yml):schema}
+      - name: CommentPostRequest
+        contentType: "application/json"
+        schema: ${file(src/schema/CommentPostRequest.yml):schema}
+      - name: ForgotPasswordRequest
+        contentType: "application/json"
+        schema: ${file(src/schema/ForgotPasswordRequest.yml):schema}
+  ProfilesTable:
+    name: !Ref ProfilesTable
+    arn: !GetAtt ProfilesTable.Arn
+    gsi: "queryProfileByUserId"
+  UsersTable:
+    name: !Ref UsersTable
+    arn: !GetAtt UsersTable.Arn
+    gsi: "queryByUserEmail"
+  PostsTable:
+    name: !Ref PostsTable
+    arn: !GetAtt PostsTable.Arn
+    gsi: "queryPostsByUserId"
+  Authorizer:
+    arn: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:auth-service-${self:provider.stage}-auth
+  bundle:
+    linting: false
+  app:
+    name: DeveloperConnector

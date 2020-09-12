@@ -1,0 +1,11 @@
+UsersTableIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:Query
+    - dynamodb:PutItem
+    - dynamodb:DeleteItem
+    - dynamodb:GetItem
+    - dynamodb:UpdateItem
+  Resource:
+    - ${self:custom.UsersTable.arn}
+    - !Join ["/", ["${self:custom.UsersTable.arn}", "index", "${self:custom.UsersTable.gsi}"]]

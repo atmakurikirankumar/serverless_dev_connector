@@ -1,0 +1,20 @@
+PostsTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: ${self:custom.app.name}-Posts-${self:provider.stage}
+    BillingMode: PAY_PER_REQUEST
+    AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: user
+        AttributeType: S
+    KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+    GlobalSecondaryIndexes:
+      - IndexName: ${self:custom.PostsTable.gsi}
+        KeySchema:
+          - AttributeName: user
+            KeyType: HASH
+        Projection:
+          ProjectionType: ALL
