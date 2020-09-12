@@ -29,5 +29,10 @@ Local Setup
   13) Then in AWS amplify - Choose the option of Deploy without git provider. There you will get an option to drag and drop the zip file that you created. Thats it - rest will be handled by Amplify and you will get the URL of the app
   14) Launch the URL and enjoy the app....
   
+ CLENAUP OF RESOURCES
+ 1) Delete the app in AWS Amplify
+ 2) cd into profile-service folder. RUN the command serverless remove -v to remove all the resources created in AWS
+ 3) cd into auth-service folder. RUN the command serverless remove -v to remove all the resources created in AWS
+  
   BEST OF LUCK
     BIG BIG THanks to Brad for his course, app, and the code 
